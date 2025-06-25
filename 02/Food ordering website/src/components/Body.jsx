@@ -1,33 +1,22 @@
 import RestaurantCards from "./RestaurantCards";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Shimmer from "./Shimmer";
+import { Link } from "react-router-dom";
+import { BsXCircle } from "react-icons/bs";
+import useRestaurantCard from "../utils/useRestaurantCard";
 
 const Body = () => {
-  const [restList, setRestList] = useState([]);
-  const [filteredRestList, setFilteredRestList] = useState([]);
+  
   const [heading, setHeading] = useState(
     "Restaurants with online food delivery in Jabalpur"
   );
   const [searchText, setsearchText] = useState("");
+  const [topRatedActive, setTopRatedActive] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { restList, filteredRestList, setFilteredRestList } = useRestaurantCard();
 
-  const fetchData = async () => {
-    const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=23.1462697&lng=79.9311628&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
-    );
+  
 
-    const json = await data.json();
-
-    setRestList(
-      json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants
-    );
-    setFilteredRestList(
-      json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants
-    );
-  };
 
   if (restList.length === 0) {
     return <Shimmer />;
@@ -71,23 +60,42 @@ const Body = () => {
         <h2 className="text font-bold text-lg">{heading}</h2>
 
         <button
-          className="px-2 py-2 bg-amber-300/80 hover:bg-amber-500 cursor-pointer border rounded-4xl"
+          className={`px-2 py-2 border rounded-4xl flex items-center gap-2
+    ${
+      topRatedActive
+        ? "bg-amber-500 text-white"
+        : "bg-amber-300/80 hover:bg-amber-500"
+    }
+  `}
           onClick={() => {
-            setHeading("Top Rated Restaurants");
-            const filterList = restList.filter(
-              (rest) => rest.info.avgRating > 4.2
-            );
-            setRestList(filterList);
+            if (!topRatedActive) {
+              setHeading("Top Rated Restaurants");
+              setFilteredRestList(
+                restList
+                  .filter((rest) => rest.info.avgRating > 4.4)
+                  .sort((a, b) => b.info.avgRating - a.info.avgRating)
+              );
+            } else {
+              setHeading("Restaurants with online food delivery in Jabalpur");
+              setFilteredRestList(restList);
+            }
+            setTopRatedActive(!topRatedActive);
           }}
         >
           Top Rated Restaurants
+          {topRatedActive && <BsXCircle />}
         </button>
       </div>
 
       <div className="cardsContainer flex flex-wrap pt-7 justify-center">
         {filteredRestList.map((restaurant) =>
           restaurant?.info ? (
-            <RestaurantCards key={restaurant.info.id} restData={restaurant} />
+            <Link
+              key={restaurant.info.id}
+              to={"/restaurant/" + restaurant.info.id}
+            >
+              <RestaurantCards restData={restaurant} />
+            </Link>
           ) : null
         )}
       </div>

@@ -1,42 +1,46 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Header = () => {
-
   const [login, setlogstate] = useState("Login");
+
   return (
-    <div className="header flex justify-between bg-red-400/80 rounded-b-2xl">
-      <div className="logo rounded-b-2xl">
+    <div className="header flex flex-wrap items-center justify-between bg-red-400/80 px-4 py-2 rounded-b-2xl">
+      {/* Logo */}
+      <div className="logo">
         <img
-          className="ml-3 rounded-full py-2"
-          src="./src/assets/logo.png"
-          height={100}
-          width={100}
+          className="rounded-full"
+          src={logo}
+          height={80}
+          width={80}
           alt=""
         />
       </div>
-      <div className="mr-5 flex w-4/5 justify-end">
-        <ul className="text-black flex justify-between items-center w-2/7 mx-8 font-bold">
-          <li className="hover:scale-125 hover:border-b-amber-900 hover:border-b-1 hover:cursor-pointer transition-all ">
-            Home
+
+      {/* Nav + Button */}
+      <div className="flex flex-wrap justify-end items-center gap-6 mt-2 sm:mt-0">
+        <ul className="flex flex-wrap gap-6 items-center text-black font-bold">
+          <li className="hover:scale-125 transition-all">
+            <Link to="/">Home</Link>
           </li>
-          <li className="hover:scale-105 hover:border-b-amber-900 hover:border-b-1 hover:cursor-pointer transition-all ">
-            About
+          <li className="hover:scale-105 transition-all">
+            <Link to="/About">About</Link>
           </li>
-          <li className="hover:scale-105 hover:border-b-amber-900 hover:border-b-1 hover:cursor-pointer transition-all ">
-            Contact us
+          <li className="hover:scale-105 transition-all">
+            <Link to="/Contact">Contact us</Link>
           </li>
-          <li className="hover:scale-105 hover:border-b-amber-900 hover:border-b-1 hover:cursor-pointer transition-all ">
-            Cart
-          </li>
-          <button
-            className="hover:scale-105 hover:cursor-pointer transition-all border-2 rounded-2xl px-2 py-1.5 w-1/6"
-            onClick={() => {
-             login === "Login" ? setlogstate("Logout") : setlogstate("Login");
-            }}
-          >
-            {login}
-          </button>
+          <li className="hover:scale-105 transition-all">Cart</li>
         </ul>
+
+        <button
+          className="hover:scale-105 transition-all border-2 rounded-2xl px-4 py-1 text-sm"
+          onClick={() =>
+            login === "Login" ? setlogstate("Logout") : setlogstate("Login")
+          }
+        >
+          {login}
+        </button>
       </div>
     </div>
   );
