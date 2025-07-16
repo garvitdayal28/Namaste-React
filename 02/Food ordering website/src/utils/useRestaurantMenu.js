@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { MENU_API } from "../utils/constants";
+import { useStore } from "./store";
 
 const useRestaurantMenu = (restid) => {
+  const { setApiData } = useStore();
+  const [restInfo, setRestInfo] = useState(null);
 
-    const [restInfo , setRestInfo] = useState(null)
-  
-    useEffect(() => {
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -17,7 +18,7 @@ const useRestaurantMenu = (restid) => {
     const json = await data.json();
     setRestInfo(json.data);
   };
-
+  // setApiData(restInfo);
   return restInfo;
 };
 

@@ -1,72 +1,73 @@
-import RestaurantCards from "./RestaurantCards";
+import RestaurantCards, { PureVeg } from "./RestaurantCards";
 import { useState } from "react";
 import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import { BsXCircle } from "react-icons/bs";
 import useRestaurantCard from "../utils/useRestaurantCard";
+import { FaSearch } from "react-icons/fa";
 
 const Body = () => {
-  
   const [heading, setHeading] = useState(
     "Restaurants with online food delivery in Jabalpur"
   );
   const [searchText, setsearchText] = useState("");
   const [topRatedActive, setTopRatedActive] = useState(false);
 
-  const { restList, filteredRestList, setFilteredRestList } = useRestaurantCard();
+  const { restList, filteredRestList, setFilteredRestList } =
+    useRestaurantCard();
 
-  
-
+  const VegRestaurantCard = PureVeg(RestaurantCards);
 
   if (restList.length === 0) {
     return <Shimmer />;
   }
 
   return (
-    <div className="body ">
-      <div className="searchBarContainer flex flex-row justify-center items-center">
-        <input
-          type="text"
-          className="searchBar border-2 p-3 px-6 mt-3 rounded-full flex justify-between w-1/2"
-          placeholder="What do you want to eat?"
-          value={searchText}
-          onChange={(e) => {
-            setsearchText(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
+    <div className="body">
+      <div className="searchBarContainer flex justify-center items-center mt-8 mb-6 w-full">
+        <div className="relative w-1/2">
+          <input
+            type="text"
+            className="searchBar border-2 border-red-200 p-4 pr-24 pl-6 rounded-full w-full shadow-md focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-300"
+            placeholder="What do you want to eat?"
+            value={searchText}
+            onChange={(e) => setsearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const searchFilter = restList.filter((rest) =>
+                  rest.info.name
+                    .toLowerCase()
+                    .includes(searchText.toLowerCase())
+                );
+                setFilteredRestList(searchFilter);
+              }
+            }}
+          />
+          <button
+            className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-red-400 hover:bg-red-500 text-white font-bold rounded-full shadow-md flex items-center gap-2 transition-all"
+            onClick={() => {
               const searchFilter = restList.filter((rest) =>
                 rest.info.name.toLowerCase().includes(searchText.toLowerCase())
               );
               setFilteredRestList(searchFilter);
-            }
-          }}
-        />
-        <button
-          className="px-3 py-1.3 bg-amber-300/80 hover:bg-amber-500 cursor-pointer border rounded-3xl"
-          onClick={() => {
-            const searchFilter = restList.filter((rest) =>
-              rest.info.name.toLowerCase().includes(searchText.toLowerCase())
-            );
-
-            setFilteredRestList(searchFilter);
-          }}
-        >
-          Search
-        </button>
+            }}
+          >
+            <span>Search</span>
+            <FaSearch className="text-sm" />
+          </button>
+        </div>
       </div>
 
-      <div className="textContainer flex justify-around items-center pt-4">
-        <h2 className="text font-bold text-lg">{heading}</h2>
+      <div className="textContainer flex justify-between items-center pt-4 px-12 mb-4">
+        <h2 className="text-2xl font-bold text-gray-700">{heading}</h2>
 
         <button
-          className={`px-2 py-2 border rounded-4xl flex items-center gap-2
-    ${
-      topRatedActive
-        ? "bg-amber-500 text-white"
-        : "bg-amber-300/80 hover:bg-amber-500"
-    }
-  `}
+          className={`px-4 py-2 border-2 rounded-full flex items-center gap-2 shadow-md transition-all
+            ${
+              topRatedActive
+                ? "bg-red-500 text-white border-red-500"
+                : "bg-white text-red-500 border-red-400 hover:bg-red-500 hover:text-white"
+            }`}
           onClick={() => {
             if (!topRatedActive) {
               setHeading("Top Rated Restaurants");
@@ -82,7 +83,7 @@ const Body = () => {
             setTopRatedActive(!topRatedActive);
           }}
         >
-          Top Rated Restaurants
+          <span className="font-bold">Top Rated Restaurants</span>
           {topRatedActive && <BsXCircle />}
         </button>
       </div>
@@ -94,7 +95,13 @@ const Body = () => {
               key={restaurant.info.id}
               to={"/restaurant/" + restaurant.info.id}
             >
-              <RestaurantCards restData={restaurant} />
+              {restaurant?.info?.badges?.imageBadges?.some(
+                (badge) => badge.description?.toLowerCase() === "pureveg"
+              ) ? (
+                <VegRestaurantCard restData={restaurant} />
+              ) : (
+                <RestaurantCards restData={restaurant} />
+              )}
             </Link>
           ) : null
         )}
